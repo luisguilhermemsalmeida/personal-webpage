@@ -1,4 +1,4 @@
-var width, height, largeHeader, canvas, ctx, points, target, animateHeader = true;
+var width, height, largeHeader, canvas, ctx, points, target, animateHeader = true, coefficient, shiftDistanceCoefficient;
 function initParticles() {
     // Main
     initHeader();
@@ -11,14 +11,18 @@ function initHeader() {
     height = window.innerHeight;
     target = {x: width/2, y: height/2};
 
+    coefficient = width/3000 + 0.3;
+    shiftDistanceCoefficient = width/3000 + 0.1;
+
+
     canvas = document.getElementById('demo-canvas');
     canvas.width = width;
     canvas.height = height;
     ctx = canvas.getContext('2d');
     // create points
     var ratio = width/height;
-    var numberOfColumns = width/64;
-    var numberOfRows = height/100 * (ratio + 1);
+    var numberOfColumns = width/64 + 3;
+    var numberOfRows = height/30;
     points = [];
     var columnSize = width/numberOfColumns;
     var rowSize = height/numberOfRows;
@@ -63,7 +67,7 @@ function initHeader() {
 
     // assign a circle to each point
     for(var index in points) {
-        points[index].circle = new Circle(points[index], 3 + Math.random() * 2, 'rgba(255,255,255,0.3)');
+        points[index].circle = new Circle(points[index], 2 + Math.random() * 2, 'rgba(255,255,255,0.3)');
     }
 }
 
@@ -148,13 +152,13 @@ function animate() {
         ctx.clearRect(0,0,width,height);
         for(var i in points) {
             // detect points in range
-            if(Math.abs(getDistance(target, points[i])) < 4000) {
+            if(Math.abs(getDistance(target, points[i])) < 4000*coefficient) {
                 points[i].active = 0.3;
                 points[i].circle.active = 0.6;
-            } else if(Math.abs(getDistance(target, points[i])) < 20000) {
+            } else if(Math.abs(getDistance(target, points[i])) < 15000*coefficient) {
                 points[i].active = 0.1;
                 points[i].circle.active = 0.3;
-            } else if(Math.abs(getDistance(target, points[i])) < 40000) {
+            } else if(Math.abs(getDistance(target, points[i])) < 30000*coefficient) {
                 points[i].active = 0.02;
                 points[i].circle.active = 0.1;
             } else {
@@ -170,8 +174,10 @@ function animate() {
 }
 
 function shiftPoint(p) {
-    TweenLite.to(p, 1+1*Math.random(), {x:p.originX-50+Math.random()*100,
-        y: p.originY-50+Math.random()*100, ease:Circ.easeInOut,
+    TweenLite.to(p, 1+Math.random(), {
+        x: (p.originX-50*shiftDistanceCoefficient) + Math.random()*100*shiftDistanceCoefficient,
+        y: (p.originY-50*shiftDistanceCoefficient) + Math.random()*100*shiftDistanceCoefficient,
+        ease: Circ.easeInOut,
         onComplete: function() {
             shiftPoint(p);
         }});
@@ -212,108 +218,3 @@ function Circle(pos,rad,color) {
 function getDistance(p1, p2) {
     return Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2);
 }
-// particlesJS("intro-content", {
-//     "particles": {
-//         "number": {
-//             "value": 80,
-//             "density": {
-//                 "enable": true,
-//                 "value_area": 800
-//             }
-//         },
-//         "color": {
-//             "value": "#ffffff"
-//         },
-//         "shape": {
-//             "type": "circle",
-//             "stroke": {
-//                 "width": 0,
-//                 "color": "#000000"
-//             },
-//             "polygon": {
-//                 "nb_sides": 5
-//             }
-//         },
-//         "opacity": {
-//             "value": 0.3,
-//             "random": false,
-//             "anim": {
-//                 "enable": false,
-//                 "speed": 1,
-//                 "opacity_min": 0.1,
-//                 "sync": false
-//             }
-//         },
-//         "size": {
-//             "value": 3,
-//             "random": true,
-//             "anim": {
-//                 "enable": false,
-//                 "speed": 40,
-//                 "size_min": 0.1,
-//                 "sync": false
-//             }
-//         },
-//         "line_linked": {
-//             "enable": true,
-//             "distance": 180,
-//             "color": "#ffffff",
-//             "opacity": 0.4,
-//             "width": 1
-//         },
-//         "move": {
-//             "enable": true,
-//             "speed": 5,
-//             "direction": "none",
-//             "random": false,
-//             "straight": false,
-//             "out_mode": "out",
-//             "bounce": false,
-//             "attract": {
-//                 "enable": false,
-//                 "rotateX": 600,
-//                 "rotateY": 1200
-//             }
-//         }
-//     },
-//     "interactivity": {
-//         "detect_on": "canvas",
-//         "events": {
-//             "onhover": {
-//                 "enable": true,
-//                 "mode": "grab"
-//             },
-//             "onclick": {
-//                 "enable": true,
-//                 "mode": "repulse"
-//             },
-//             "resize": true
-//         },
-//         "modes": {
-//             "grab": {
-//                 "distance": 140,
-//                 "line_linked": {
-//                     "opacity": 1
-//                 }
-//             },
-//             "bubble": {
-//                 "distance": 400,
-//                 "size": 40,
-//                 "duration": 2,
-//                 "opacity": 8,
-//                 "speed": 3
-//             },
-//             "repulse": {
-//                 "distance": 200,
-//                 "duration": 0.4
-//             },
-//             "push": {
-//                 "particles_nb": 4
-//             },
-//             "remove": {
-//                 "particles_nb": 2
-//             }
-//         }
-//     },
-//     "retina_detect": true
-// });
