@@ -1,4 +1,4 @@
-var width, height, largeHeader, canvas, ctx, points, target, animateHeader = true;
+var width, height, largeHeader, canvas, ctx, points, target, animateHeader = true, coefficient, shiftDistanceCoefficient;
 function initParticles() {
     // Main
     initHeader();
@@ -11,22 +11,27 @@ function initHeader() {
     height = window.innerHeight;
     target = {x: width/2, y: height/2};
 
-    // largeHeader = document.getElementById('large-header');
-    // largeHeader.style.height = height+'px';
+    coefficient = width/3000 + 0.3;
+    shiftDistanceCoefficient = width/3000 + 0.1;
+
 
     canvas = document.getElementById('demo-canvas');
     canvas.width = width;
     canvas.height = height;
     ctx = canvas.getContext('2d');
-
     // create points
+    var ratio = width/height;
+    var numberOfColumns = width/64 + 3;
+    var numberOfRows = height/30;
     points = [];
-    for(var x = 0; x < width; x = x + width/20) {
-        for(var y = 0; y < height; y = y + height/20) {
-            var px = x + Math.random()*width/20;
-            var py = y + Math.random()*height/20;
-            var p = {x: px, originX: px, y: py, originY: py };
-            points.push(p);
+    var columnSize = width/numberOfColumns;
+    var rowSize = height/numberOfRows;
+    for (var column = 0; column < numberOfColumns; column++) {
+        for (var row = 0; row < numberOfRows; row++) {
+            var pointX = (columnSize * column) + (Math.random() * columnSize);
+            var pointY = (rowSize * row) + (Math.random() * rowSize);
+            var point = {originX: pointX, originY: pointY, x: pointX, y: pointY};
+            points.push(point);
         }
     }
 
@@ -61,9 +66,38 @@ function initHeader() {
     }
 
     // assign a circle to each point
-    for(var i in points) {
-        var c = new Circle(points[i], 3+Math.random()*2, 'rgba(255,255,255,0.3)');
-        points[i].circle = c;
+    for(var index in points) {
+        points[index].circle = new Circle(points[index], 2 + Math.random() * 2, 'rgba(255,255,255,0.3)');
+    }
+}
+
+function mouseclick(e) {
+    var newTargetPositionX = 0;
+    var newTargetPositionY = 0;
+    if (e.pageX || e.pageY) {
+        newTargetPositionX = e.pageX;
+        newTargetPositionY = e.pageY;
+    }
+    else if (e.clientX || e.clientY) {
+        newTargetPositionX = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+        newTargetPositionY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+    }
+    var currentX = target.x;
+    var currentY = target.y;
+
+    var animationIterationsX = Math.abs(currentX - newTargetPositionX);
+    var animationIterationsY =  Math.abs(currentY - newTargetPositionY);
+    var directionX = (newTargetPositionX - currentX)/Math.abs(newTargetPositionX - currentX);
+    var directionY = (newTargetPositionY - currentY)/Math.abs(newTargetPositionY - currentY);
+    for (var animationX = 0; animationX < animationIterationsX; animationX++) {
+        setTimeout(function () {
+            target.x += directionX;
+        }, 2*animationX);
+    }
+    for (var animationY = 0; animationY < animationIterationsY; animationY++) {
+        setTimeout(function () {
+            target.y += directionY;
+        }, 2*animationY);
     }
 }
 
@@ -71,28 +105,30 @@ function initHeader() {
 function addListeners() {
     if(!('ontouchstart' in window)) {
         window.addEventListener('mousemove', mouseMove);
+    } else {
+        window.addEventListener('click', mouseclick);
     }
     window.addEventListener('scroll', scrollCheck);
     window.addEventListener('resize', resize);
 }
 
 function mouseMove(e) {
-    var posx = posy = 0;
+    var newTargetPositionX = 0;
+    var newTargetPositionY = 0;
     if (e.pageX || e.pageY) {
-        posx = e.pageX;
-        posy = e.pageY;
+        newTargetPositionX = e.pageX;
+        newTargetPositionY = e.pageY;
     }
-    else if (e.clientX || e.clientY)    {
-        posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-        posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+    else if (e.clientX || e.clientY) {
+        newTargetPositionX = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+        newTargetPositionY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
     }
-    target.x = posx;
-    target.y = posy;
+    target.x = newTargetPositionX;
+    target.y = newTargetPositionY;
 }
 
 function scrollCheck() {
-    if(document.body.scrollTop > height) animateHeader = false;
-    else animateHeader = true;
+    animateHeader = document.body.scrollTop <= height;
 }
 
 function resize() {
@@ -116,13 +152,13 @@ function animate() {
         ctx.clearRect(0,0,width,height);
         for(var i in points) {
             // detect points in range
-            if(Math.abs(getDistance(target, points[i])) < 4000) {
+            if(Math.abs(getDistance(target, points[i])) < 4000*coefficient) {
                 points[i].active = 0.3;
                 points[i].circle.active = 0.6;
-            } else if(Math.abs(getDistance(target, points[i])) < 20000) {
+            } else if(Math.abs(getDistance(target, points[i])) < 15000*coefficient) {
                 points[i].active = 0.1;
                 points[i].circle.active = 0.3;
-            } else if(Math.abs(getDistance(target, points[i])) < 40000) {
+            } else if(Math.abs(getDistance(target, points[i])) < 30000*coefficient) {
                 points[i].active = 0.02;
                 points[i].circle.active = 0.1;
             } else {
@@ -138,8 +174,10 @@ function animate() {
 }
 
 function shiftPoint(p) {
-    TweenLite.to(p, 1+1*Math.random(), {x:p.originX-50+Math.random()*100,
-        y: p.originY-50+Math.random()*100, ease:Circ.easeInOut,
+    TweenLite.to(p, 1+Math.random(), {
+        x: (p.originX-50*shiftDistanceCoefficient) + Math.random()*100*shiftDistanceCoefficient,
+        y: (p.originY-50*shiftDistanceCoefficient) + Math.random()*100*shiftDistanceCoefficient,
+        ease: Circ.easeInOut,
         onComplete: function() {
             shiftPoint(p);
         }});
@@ -180,108 +218,3 @@ function Circle(pos,rad,color) {
 function getDistance(p1, p2) {
     return Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2);
 }
-// particlesJS("intro-content", {
-//     "particles": {
-//         "number": {
-//             "value": 80,
-//             "density": {
-//                 "enable": true,
-//                 "value_area": 800
-//             }
-//         },
-//         "color": {
-//             "value": "#ffffff"
-//         },
-//         "shape": {
-//             "type": "circle",
-//             "stroke": {
-//                 "width": 0,
-//                 "color": "#000000"
-//             },
-//             "polygon": {
-//                 "nb_sides": 5
-//             }
-//         },
-//         "opacity": {
-//             "value": 0.3,
-//             "random": false,
-//             "anim": {
-//                 "enable": false,
-//                 "speed": 1,
-//                 "opacity_min": 0.1,
-//                 "sync": false
-//             }
-//         },
-//         "size": {
-//             "value": 3,
-//             "random": true,
-//             "anim": {
-//                 "enable": false,
-//                 "speed": 40,
-//                 "size_min": 0.1,
-//                 "sync": false
-//             }
-//         },
-//         "line_linked": {
-//             "enable": true,
-//             "distance": 180,
-//             "color": "#ffffff",
-//             "opacity": 0.4,
-//             "width": 1
-//         },
-//         "move": {
-//             "enable": true,
-//             "speed": 5,
-//             "direction": "none",
-//             "random": false,
-//             "straight": false,
-//             "out_mode": "out",
-//             "bounce": false,
-//             "attract": {
-//                 "enable": false,
-//                 "rotateX": 600,
-//                 "rotateY": 1200
-//             }
-//         }
-//     },
-//     "interactivity": {
-//         "detect_on": "canvas",
-//         "events": {
-//             "onhover": {
-//                 "enable": true,
-//                 "mode": "grab"
-//             },
-//             "onclick": {
-//                 "enable": true,
-//                 "mode": "repulse"
-//             },
-//             "resize": true
-//         },
-//         "modes": {
-//             "grab": {
-//                 "distance": 140,
-//                 "line_linked": {
-//                     "opacity": 1
-//                 }
-//             },
-//             "bubble": {
-//                 "distance": 400,
-//                 "size": 40,
-//                 "duration": 2,
-//                 "opacity": 8,
-//                 "speed": 3
-//             },
-//             "repulse": {
-//                 "distance": 200,
-//                 "duration": 0.4
-//             },
-//             "push": {
-//                 "particles_nb": 4
-//             },
-//             "remove": {
-//                 "particles_nb": 2
-//             }
-//         }
-//     },
-//     "retina_detect": true
-// });
