@@ -14,13 +14,11 @@ function initHeader() {
     coefficient = width/3000 + 0.3;
     shiftDistanceCoefficient = width/3000 + 0.1;
 
-
     canvas = document.getElementById('demo-canvas');
     canvas.width = width;
     canvas.height = height;
     ctx = canvas.getContext('2d');
     // create points
-    var ratio = width/height;
     var numberOfColumns = width/64 + 3;
     var numberOfRows = height/30;
     points = [];
