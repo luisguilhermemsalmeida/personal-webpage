@@ -1508,7 +1508,7 @@ canvas {
 #about {
 	background: #FFFFFF;
 	padding-top: 15px;
-	padding-bottom: 15px;
+	padding-bottom: 60px;
 }
 #about .section-intro {
 	margin-bottom: 3rem;
@@ -1572,6 +1572,9 @@ canvas {
 	margin: 0;
 }
 
+#contact-me-button {
+	margin-bottom: 0;
+}
 .button-section {
 	text-align: center;
 }
@@ -1639,7 +1642,7 @@ canvas {
  * ------------------------------------------------------------------- 
  */
 #resume {
-	padding-top: 12rem;
+	padding-top: 50px;
 	padding-bottom: 12rem;
 }
 
