@@ -1,0 +1,10 @@
+#portuguese
+RewriteCond %{HTTP:Accept-Language} ^pt.*$ [NC]
+RewriteCond %{REQUEST_URI} ^/$ [NC]
+RewriteCond %{QUERY_STRING} !(^q\=) [NC]
+RewriteRule ^(.*)$ /pt_BR [L,R=301]
+
+#all others go to english
+RewriteCond %{REQUEST_URI} ^/$ [NC]
+RewriteCond %{QUERY_STRING} !(^q\=) [NC]
+RewriteRule ^(.*)$ /en [L,R=301]
