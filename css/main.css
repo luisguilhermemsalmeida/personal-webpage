@@ -1362,6 +1362,12 @@ canvas {
 	letter-spacing: .3rem;
 	text-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
 }
+.intro-content .intro-position-wrapper {
+	margin-bottom: 3rem;
+}
+.intro-content p.intro-position {
+	margin-bottom: 2px;
+}
 .intro-content .intro-position {
 	font-family: "lora-regular", serif;
 	font-size: 1.7rem;
