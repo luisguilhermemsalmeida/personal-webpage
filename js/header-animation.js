@@ -19,8 +19,8 @@ function initHeader() {
     canvas.height = height;
     ctx = canvas.getContext('2d');
     // create points
-    var numberOfColumns = width/64 + 3;
-    var numberOfRows = height/30;
+    var numberOfColumns = width/128 + 3;
+    var numberOfRows = height/60;
     points = [];
     var columnSize = width/numberOfColumns;
     var rowSize = height/numberOfRows;
