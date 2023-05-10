@@ -8,20 +8,14 @@
 
 
 <url>
-  <loc>https://luisguilhermealmeida.me/</loc>
-  <lastmod>2019-01-26T23:48:54+00:00</lastmod>
+  <loc>https://luisalmeida.dev/</loc>
+  <lastmod>2023-05-10T05:48:54+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://luisguilhermealmeida.me/index.html</loc>
-  <lastmod>2019-01-26T23:48:54+00:00</lastmod>
+  <loc>https://luisalmeida.dev</loc>
+  <lastmod>2023-05-10T05:48:54+00:00</lastmod>
   <priority>0.80</priority>
 </url>
-<url>
-  <loc>https://luisguilhermealmeida.me/pt_BR/index.html</loc>
-  <lastmod>2019-01-26T23:48:54+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-
 
 </urlset>
